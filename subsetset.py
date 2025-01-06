@@ -5,7 +5,7 @@ n = len(elements)
 
 total_subsets = 1 << n  
 
-print("All subsets:")
+
 for i in range(total_subsets):
     subset = []
     for j in range(n):
