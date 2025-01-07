@@ -1,43 +1,72 @@
 def print_board(board):
+    """Print the Sudoku board in a readable format."""
     for row in board:
         print(" ".join(str(num) if num != 0 else "." for num in row))
 
-def is_valid(board, row, col, num):
-    # Check if the number is not in the current row
-    if num in board[row]:
-        return False
-
-    # Check if the number is not in the current column
-    if num in [board[i][col] for i in range(9)]:
-        return False
-
-    # Check if the number is not in the current 3x3 subgrid
+def get_candidates(board, row, col):
+    """Get a list of valid candidates for a given cell (row, col)."""
+    if board[row][col] != 0:
+        return []  
+    
+    used = set(board[row]) | {board[i][col] for i in range(9)}
     start_row, start_col = 3 * (row // 3), 3 * (col // 3)
     for i in range(start_row, start_row + 3):
         for j in range(start_col, start_col + 3):
-            if board[i][j] == num:
-                return False
+            used.add(board[i][j])
+    
+    return [num for num in range(1, 10) if num not in used]
 
-    return True
+def solve_sudoku_simple_logic(board):
+    """Solve the Sudoku puzzle using basic logical rules."""
+    while True:
+        progress = False
+        
+        for row in range(9):
+            for col in range(9):
+                if board[row][col] == 0:
+                    candidates = get_candidates(board, row, col)
+                    if len(candidates) == 1:
+                        board[row][col] = candidates[0]
+                        progress = True
+        
+        for num in range(1, 10):
+            for row in range(9):
+                positions = [
+                    col for col in range(9)
+                    if board[row][col] == 0 and num in get_candidates(board, row, col)
+                ]
+                if len(positions) == 1:
+                    board[row][positions[0]] = num
+                    progress = True
+            
+            for col in range(9):
+                positions = [
+                    row for row in range(9)
+                    if board[row][col] == 0 and num in get_candidates(board, row, col)
+                ]
+                if len(positions) == 1:
+                    board[positions[0]][col] = num
+                    progress = True
+            
+            for box_row in range(0, 9, 3):
+                for box_col in range(0, 9, 3):
+                    positions = []
+                    for i in range(3):
+                        for j in range(3):
+                            row, col = box_row + i, box_col + j
+                            if board[row][col] == 0 and num in get_candidates(board, row, col):
+                                positions.append((row, col))
+                    if len(positions) == 1:
+                        r, c = positions[0]
+                        board[r][c] = num
+                        progress = True
+        
+        if not progress:
+            break
+    
+    return all(all(cell != 0 for cell in row) for row in board)
 
-def solve_sudoku(board):
-    for row in range(9):
-        for col in range(9):
-            if board[row][col] == 0:  # Find an empty cell
-                for num in range(1, 10):  # Try numbers 1 to 9
-                    if is_valid(board, row, col, num):
-                        board[row][col] = num
-
-                        if solve_sudoku(board):  # Recursively solve the rest
-                            return True
-                        board[row][col] = 0  # Backtrack if the solution doesn't work
-
-                return False  # If no valid number found, return False
-    return True  # Puzzle solved
-
-# Example usage
 if __name__ == "__main__":
-    # Example Sudoku puzzle (0 represents empty cells)
     puzzle = [
         [5, 3, 0, 0, 7, 0, 0, 0, 0],
         [6, 0, 0, 1, 9, 5, 0, 0, 0],
@@ -50,11 +79,11 @@ if __name__ == "__main__":
         [0, 0, 0, 0, 8, 0, 0, 7, 9],
     ]
 
-    print("Original Sudoku Puzzle:")
+    print("original Sudoku Puzzle:")
     print_board(puzzle)
 
-    if solve_sudoku(puzzle):
-        print("\nSolved Sudoku Puzzle:")
+    if solve_sudoku_simple_logic(puzzle):
+        print("\nsolved Sudoku Puzzle:")
         print_board(puzzle)
     else:
-        print("\nNo solution exists!")
+        print("\ncould not solve the puzzle using simple logic!")
