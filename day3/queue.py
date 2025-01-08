@@ -21,3 +21,8 @@ q.enqueue(40)
 print("after enqueues:", q.value)
 print("dequeue:", q.dequeue())
 print("after dequeue:", q.value)
+
+q.enqueue(50)
+print("after enqueues:", q.value)
+print("dequeue:", q.dequeue())
+print("after dequeue:", q.value)
