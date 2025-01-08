@@ -25,3 +25,4 @@ def traverse_linked_list(head):
     print("None")
 
 traverse_linked_list(head)
+traverse_linked_list(node1)
