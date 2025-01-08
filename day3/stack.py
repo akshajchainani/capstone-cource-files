@@ -22,4 +22,7 @@ s.push(40)
 print("after pushes:", s.value)
 print("Pop:", s.pop())
 print("after pop:", s.value)
-
+s.push(50)
+print("after pushes:", s.value)
+print("Pop:", s.pop())
+print("after pop:", s.value)
